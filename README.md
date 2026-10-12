@@ -3,35 +3,42 @@
 A landing page where you upload a resume PDF and get a score out of 100, the
 skills the parser found in it, and the skills it expected but didn't find.
 
-Built as a **front-end mock**: HTML, CSS and vanilla JavaScript, no build step,
-no dependencies, no back end.
+Built as a **front-end mock**: React + Vite, no back end.
 
 ## Run it
 
-There's nothing to install. Open `index.html` in a browser:
+```bash
+npm install
+npm run dev      # dev server with hot reload
+npm run build    # production bundle into dist/
+npm run preview  # serve the built bundle
+```
+
+Requires Node 22 or newer (Vite 8).
+
+## Layout
 
 ```
-# either double-click index.html, or serve the folder:
-npx serve .
+index.html              # Vite entry — just mounts #root
+src/
+  main.jsx              # React root, imports styles.css
+  App.jsx               # state, file validation, the scan timer
+  styles.css            # all styling
+  lib/
+    analyser.js         # ROLE_SKILLS + the mock scoring function
+  components/
+    Header.jsx
+    Scanner.jsx         # dropzone, file input, progress bar
+    Results.jsx         # score ring + found/missing panels
+    HowItWorks.jsx
+DECISION.md             # the original brief
 ```
-
-Opening the file directly (`file://`) works fine — nothing here fetches over the
-network.
-
-## Files
-
-| File | What it is |
-| --- | --- |
-| `index.html` | The page: header, hero, upload card, results block, "How it works", footer. |
-| `styles.css` | All styling. The score ring is a CSS `conic-gradient` — no canvas, no chart library. |
-| `app.js` | Drag-and-drop wiring, validation, the scan animation, and the mock analyser. |
-| `DECISION.md` | The original brief for the build. |
 
 ## How the mock works
 
 A browser can't read a PDF without a parser library, so this build doesn't
-pretend to. `analyseResume()` in `app.js` hashes the **filename** and uses that
-to pick which skills are present:
+pretend to. `analyseResume()` in `src/lib/analyser.js` hashes the **filename**
+and uses that to pick which skills are present:
 
 1. The name is lowercased and run through an **FNV-1a** hash, giving a stable
    integer seed.
@@ -59,29 +66,33 @@ browser, or your own back end — and keep the return shape:
 { score: Number, found: String[], missing: String[], verdict: String }
 ```
 
-Nothing else in `app.js` needs to change. The scan animation already exists to
-give the UI a state to sit in while a real parse runs.
+Keep it a plain function of its input: `App.jsx` calls it and stores the result
+in state, and nothing else needs to change.
 
 ## Where to change things
 
-- **The target role's skills** — the `ROLE_SKILLS` array at the top of `app.js`.
-- **Scan step labels and timing** — `SCAN_STEPS`, and the `420` ms interval in
-  `runScan()`.
-- **Colours** — the `:root` custom properties at the top of `styles.css`.
-- **Upload limits** — the `5 MB` check in `handleFile()`.
+- **The target role's skills** — `ROLE_SKILLS` in `src/lib/analyser.js`.
+- **Scan steps and timing** — `SCAN_STEPS`, and `STEP_MS` in `src/App.jsx`.
+- **Colours** — the `:root` custom properties at the top of `src/styles.css`.
+- **Upload limit** — `MAX_BYTES` in `src/App.jsx`.
 
-## Browser notes
+## Notes on the React version
 
-- Drag-and-drop tracks a **depth counter** rather than toggling a class on
-  `dragenter`/`dragleave`, because those events fire again for every child
-  element — the naive version makes the dropzone highlight strobe as the cursor
-  moves across the icon and text.
+- **The scan is a chain of `setTimeout`s, not an interval.** The ids live in a
+  ref (`timers`) so `clearTimers()` can cancel a scan mid-flight — that's what
+  the Cancel button and Start over both call. Changing them doesn't re-render,
+  which is correct: they're not render data.
+- **The dropzone reads `isDragging` from state but counts depth in a ref.**
+  `dragenter`/`dragleave` fire again for every child element, so toggling on
+  each event makes the highlight strobe as the cursor crosses the icon and text.
+  The ref holds the count; state only tracks whether we're dragging at all.
+- **The file input is cleared after each pick** (`e.target.value = ''`),
+  otherwise selecting the same file twice fires no `change` event.
 - Keyboard users can focus the dropzone and press <kbd>Enter</kbd> or
-  <kbd>Space</kbd> to open the file picker.
-- `prefers-reduced-motion` is respected.
+  <kbd>Space</kbd>. `prefers-reduced-motion` is respected.
 
 ## Status
 
-The layout, drag-and-drop handling and scan animation have not been verified in
-a browser. `node --check app.js` passes, and the analyser's logic was tested
-standalone for stability and non-overlapping output.
+`npm run build` passes (21 modules), and the analyser was checked to return the
+same scores as the pre-React version. The page itself has not been opened in a
+browser, so the rendered layout and drag-and-drop are unverified.

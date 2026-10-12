@@ -212,6 +212,12 @@ h1, h2, h3 { line-height: 1.2; margin: 0 0 0.5em; }
   color: var(--muted);
 }
 
+.scanner-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
 /* ---------- Results ---------- */
 
 .results {

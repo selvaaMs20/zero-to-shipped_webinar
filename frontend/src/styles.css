@@ -425,6 +425,107 @@ h1, h2, h3 { line-height: 1.2; margin: 0 0 0.5em; }
 
 .site-footer p { margin: 0; }
 
+/* ---------- Form fields ---------- */
+
+.field { margin-bottom: 1.1rem; text-align: left; }
+
+.field-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.optional {
+  margin-left: 0.35rem;
+  font-size: 0.75rem;
+  color: #6b7893;
+}
+
+.text-input,
+.text-area {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-soft);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.text-input::placeholder,
+.text-area::placeholder { color: #5f6b85; }
+
+.text-input:focus-visible,
+.text-area:focus-visible {
+  outline: none;
+  border-color: var(--brand);
+}
+
+.or-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.or-row .btn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.btn.primary {
+  border-color: transparent;
+  background: linear-gradient(140deg, var(--brand-strong), #8b5cf6);
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn.primary:hover { color: #fff; filter: brightness(1.06); }
+
+/* ---------- Breakdown + notices ---------- */
+
+.notice {
+  margin: 1rem 0 0;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 10px;
+  background: rgba(251, 191, 36, 0.08);
+  color: #fcd77f;
+  font-size: 0.85rem;
+}
+
+.breakdown {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.breakdown-row {
+  display: grid;
+  grid-template-columns: 9.5rem 1fr 3rem;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.breakdown-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+
+.breakdown-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand-strong), #8b5cf6);
+}
+
+.breakdown-value { text-align: right; color: var(--text); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }

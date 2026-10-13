@@ -1,5 +1,3 @@
-import { ROLE_SKILLS } from '../lib/analyser.js';
-
 function tierFor(score) {
   if (score >= 75) return 'high';
   if (score >= 50) return 'mid';
@@ -23,8 +21,21 @@ function SkillList({ items, emptyText }) {
   );
 }
 
-export default function Results({ result, fileName, onReset }) {
-  const { score, found, missing, verdict } = result;
+/** One labelled bar from the score breakdown the API returns. */
+function Breakdown({ label, value }) {
+  return (
+    <div className="breakdown-row">
+      <span className="breakdown-label">{label}</span>
+      <div className="breakdown-track">
+        <div className="breakdown-fill" style={{ width: `${value}%` }} />
+      </div>
+      <span className="breakdown-value">{value}%</span>
+    </div>
+  );
+}
+
+export default function Results({ result, resumeFile, onReset }) {
+  const { score, verdict, matched, missing, breakdown, warning, pages } = result;
 
   return (
     <section className="results" aria-live="polite">
@@ -41,10 +52,13 @@ export default function Results({ result, fileName, onReset }) {
         </div>
         <div className="results-summary">
           <h2>{verdict}</h2>
-          <p className="file-name">{fileName}</p>
+          <p className="file-name">
+            {resumeFile?.name}
+            {pages ? ` · ${pages} page${pages === 1 ? '' : 's'}` : ''}
+          </p>
           <p>
-            Your resume covers {found.length} of the {ROLE_SKILLS.length} skills
-            this role expects. The gaps below are the fastest points to win.
+            Your resume matches {matched.length} of the {matched.length + missing.length}{' '}
+            skills this role asks for. The gaps below are the fastest points to win.
           </p>
         </div>
         <button className="btn ghost" type="button" onClick={onReset}>
@@ -52,12 +66,20 @@ export default function Results({ result, fileName, onReset }) {
         </button>
       </div>
 
+      {warning && <p className="notice">{warning}</p>}
+
+      <div className="breakdown">
+        <Breakdown label="Skill coverage" value={breakdown.coverage} />
+        <Breakdown label="Keyword overlap" value={breakdown.density} />
+        <Breakdown label="Structure" value={breakdown.structure} />
+      </div>
+
       <div className="skill-columns">
         <div className="skill-panel found">
           <h3>
-            Skills we found <span className="count">{found.length}</span>
+            Skills we found <span className="count">{matched.length}</span>
           </h3>
-          <SkillList items={found} emptyText="No matching skills found." />
+          <SkillList items={matched} emptyText="No matching skills found." />
         </div>
         <div className="skill-panel missing">
           <h3>

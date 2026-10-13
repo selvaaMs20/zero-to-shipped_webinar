@@ -1,3 +1,9 @@
 I want to build an HTML, CSS, JS landing page for my resume parser, where I should be able to upload an PDF and get the score out of it. Here I just want to see the score, what skills are present, and what skills are missing. and I'm gonna call this as 0 to shipped resume parser. This is gonna be a mock design, so just build html css is fine, no back-end server is needed
 
-i want to convert this entire project into a react project
+I want to convert this entire project into a react project
+
+I want you to move this react project into front end folder and build a backend folder that contains the express server to handle the request, lets connect to MongoDB
+
+The application should take resume PDF and JD for comparison, AI part will be added later
+
+backend folder should contains server.js, routes folder, controller folder, service folder, config folder, middleware folder and utils.js

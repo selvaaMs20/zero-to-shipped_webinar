@@ -1,7 +1,9 @@
+import { env } from '../config/env.js';
 import { isDbReady } from '../config/db.js';
 import { Scan } from '../models/Scan.js';
 import { extractPdfText } from './extractPdfText.js';
 import { analyseDocuments } from './analyse.js';
+import { analyseWithGemini } from './gemini.js';
 import { HttpError } from '../utils.js';
 
 /** Below this many characters, a "PDF" is a scanned image, not text. */
@@ -30,9 +32,11 @@ async function readPdf(file, which) {
  *
  * This is the whole body of the scan feature, minus HTTP. It takes the
  * parts of the request it needs and either returns a plain object or
- * throws an `HttpError` naming the status the client should see. Keeping
- * Express out of here is what lets the same code be called from a test or
- * a script.
+ * throws an `HttpError` naming the status the client should see.
+ *
+ * When GEMINI_API_KEY is available, analysis runs through Google Gemini AI.
+ * If the API call fails or is unavailable, it automatically falls back
+ * to the deterministic rules-based analyser.
  */
 export async function runScan({ resumeFile, jobFile, jobText = '', jobTitle = '' }) {
   const startedAt = Date.now();
@@ -63,10 +67,35 @@ export async function runScan({ resumeFile, jobFile, jobText = '', jobTitle = ''
     );
   }
 
-  const result = analyseDocuments({
-    resumeText: resume.text,
-    jobText: job.text,
-  });
+  let result;
+  if (env.geminiApiKey) {
+    try {
+      result = await analyseWithGemini({
+        resumeText: resume.text,
+        jobText: job.text,
+      });
+      console.log(`[scan] analysed using Gemini AI (${result.modelUsed})`);
+    } catch (err) {
+      console.warn('[scan] Gemini AI failed, falling back to rule-based engine:', err.message);
+      result = {
+        ...analyseDocuments({
+          resumeText: resume.text,
+          jobText: job.text,
+        }),
+        feedback: '',
+        aiPowered: false,
+      };
+    }
+  } else {
+    result = {
+      ...analyseDocuments({
+        resumeText: resume.text,
+        jobText: job.text,
+      }),
+      feedback: '',
+      aiPowered: false,
+    };
+  }
 
   const scan = {
     resumeName: resumeFile.originalname,

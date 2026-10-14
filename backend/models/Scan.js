@@ -29,6 +29,9 @@ const scanSchema = new mongoose.Schema(
       structure: { type: Number, default: 0 },
     },
 
+    feedback: { type: String, default: '' },
+    aiPowered: { type: Boolean, default: false },
+
     pages: { type: Number, default: 0 },
     resumeChars: { type: Number, default: 0 },
     jobChars: { type: Number, default: 0 },

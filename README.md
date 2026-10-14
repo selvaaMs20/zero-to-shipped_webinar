@@ -4,9 +4,8 @@ Upload a resume PDF and a job description, and get a score out of 100, the
 skills the two documents share, and the skills the role asks for that the
 resume never mentions.
 
-React frontend, Express + MongoDB backend. The scoring is rules-based for now:
-it reads the PDF's text layer and matches skills against a catalogue. The AI
-comparison is the next piece, and it slots in behind the same service seam.
+React frontend, Express + MongoDB backend. Scoring is powered by Google Gemini AI
+(via Google AI Studio) with automatic rules-based fallback when offline.
 
 ## Run it
 
@@ -28,8 +27,8 @@ The frontend proxies `/api` to port 3001 (see `frontend/vite.config.js`), so
 open **http://localhost:5173**, not the API port.
 
 Requires Node 22 or newer. MongoDB must be reachable at `MONGODB_URI`
-(defaults to a local `mongodb://127.0.0.1:27017/zero-to-shipped`); the server
-exits with a clear message if it cannot connect.
+(defaults to a local `mongodb://127.0.0.1:27017/zero-to-shipped`). Configure
+`GEMINI_API_KEY` in `.env` for AI-powered comparisons.
 
 ## Layout
 
@@ -55,8 +54,9 @@ backend/
   controller/         # request in, response out
   service/            # core logic
     scanService.js    # read + score + save one scan
+    gemini.js         # Google Gemini AI comparison & feedback
     extractPdfText.js # PDF buffer -> text
-    analyse.js        # the scoring rules
+    analyse.js        # the scoring rules (fallback)
     skills.js         # the skill catalogue and matcher
   middleware/         # multer upload config, 404, error handler
   models/             # Mongoose schemas

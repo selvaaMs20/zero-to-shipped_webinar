@@ -35,7 +35,7 @@ function Breakdown({ label, value }) {
 }
 
 export default function Results({ result, resumeFile, onReset }) {
-  const { score, verdict, matched, missing, breakdown, warning, pages } = result;
+  const { score, verdict, matched, missing, breakdown, warning, pages, feedback, aiPowered } = result;
 
   return (
     <section className="results" aria-live="polite">
@@ -51,7 +51,10 @@ export default function Results({ result, resumeFile, onReset }) {
           </div>
         </div>
         <div className="results-summary">
-          <h2>{verdict}</h2>
+          <h2>
+            {verdict}
+            {aiPowered && <span className="ai-badge">✦ Gemini AI</span>}
+          </h2>
           <p className="file-name">
             {resumeFile?.name}
             {pages ? ` · ${pages} page${pages === 1 ? '' : 's'}` : ''}
@@ -65,6 +68,13 @@ export default function Results({ result, resumeFile, onReset }) {
           Start over
         </button>
       </div>
+
+      {feedback && (
+        <div className="ai-feedback">
+          <span className="feedback-title">✦ AI Recruiter Feedback</span>
+          <p>{feedback}</p>
+        </div>
+      )}
 
       {warning && <p className="notice">{warning}</p>}
 

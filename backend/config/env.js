@@ -40,4 +40,6 @@ export const env = {
   clientOrigin: cleanEnvString(process.env.CLIENT_ORIGIN ?? 'http://localhost:5173'),
 
   maxUploadBytes: Number(cleanEnvString(process.env.MAX_UPLOAD_BYTES) ?? 5 * 1024 * 1024),
+
+  geminiApiKey: cleanEnvString(process.env.GEMINI_API_KEY ?? ''),
 };

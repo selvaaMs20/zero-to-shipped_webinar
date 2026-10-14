@@ -7,3 +7,5 @@ I want you to move this react project into front end folder and build a backend 
 The application should take resume PDF and JD for comparison, AI part will be added later
 
 backend folder should contains server.js, routes folder, controller folder, service folder, config folder, middleware folder and utils.js
+
+Below is the format to connect to GoogleAISudio APL KEY, lets connects and parse the resume and give the score

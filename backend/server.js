@@ -3,6 +3,8 @@ import { connectDb } from './config/db.js';
 import { env } from './config/env.js';
 import { redactUri } from './utils.js';
 
+const app = createApp();
+
 async function main() {
   try {
     await connectDb();
@@ -12,10 +14,9 @@ async function main() {
     console.error(
       '[db] Is MongoDB running, or is MONGODB_URI in backend/.env correct?',
     );
-    process.exit(1);
   }
 
-  const server = createApp().listen(env.port, () => {
+  const server = app.listen(env.port, () => {
     console.log(`[api] listening on http://localhost:${env.port}`);
     console.log(`[api] allowing requests from ${env.clientOrigin}`);
   });
@@ -25,4 +26,8 @@ async function main() {
   process.on('SIGTERM', shutdown);
 }
 
+// Start listener when running locally
 main();
+
+export default app;
+export { app };

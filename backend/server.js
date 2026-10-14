@@ -6,15 +6,13 @@ import { redactUri } from './utils.js';
 const app = createApp();
 
 async function main() {
-  try {
-    await connectDb();
-  } catch (err) {
+  connectDb().catch((err) => {
     console.error(`[db] could not connect to ${redactUri(env.mongoUri)}`);
     console.error(`[db] ${err.message}`);
     console.error(
       '[db] Is MongoDB running, or is MONGODB_URI in backend/.env correct?',
     );
-  }
+  });
 
   const server = app.listen(env.port, () => {
     console.log(`[api] listening on http://localhost:${env.port}`);
@@ -26,7 +24,7 @@ async function main() {
   process.on('SIGTERM', shutdown);
 }
 
-// Start listener when running locally
+// Start listener when running directly
 main();
 
 export default app;
